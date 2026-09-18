@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: taskhub-agent-binding
+  namespace: taskhub
+  labels:
+    app: taskhub
+subjects:
+  - kind: ServiceAccount
+    name: taskhub-agent
+    namespace: taskhub
+roleRef:
+  kind: Role
+  name: taskhub-pod-reader
+  apiGroup: rbac.authorization.k8s.io

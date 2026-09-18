@@ -1,0 +1,29 @@
+# Pattern 3: Multiple completions with multiple parallel executions.
+# 5 successful completions are required in total, with at most 2 Pods
+# running at the same time.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-task-job
+  namespace: taskhub
+  labels:
+    app: taskhub
+    component: job
+spec:
+  completions: 5
+  parallelism: 2
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: taskhub
+        component: job
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: batch-worker
+          image: busybox:1.36
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "echo \"Processing independent task on $(hostname)\"; sleep 5; exit 0"

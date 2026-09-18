@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: taskhub-db-pvc
+  namespace: taskhub
+  labels:
+    app: taskhub
+    component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: taskhub-db-pv

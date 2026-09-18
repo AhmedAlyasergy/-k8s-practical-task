@@ -1,0 +1,21 @@
+# On a bare `kind` cluster there is no cloud controller to actually
+# provision an external load balancer, so this Service's EXTERNAL-IP will
+# stay <pending> unless you install something like MetalLB or Cloud
+# Provider KIND. The object itself still demonstrates the LoadBalancer type
+# correctly.
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-loadbalancer
+  namespace: taskhub
+  labels:
+    app: taskhub
+    component: frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: taskhub
+    component: frontend
+  ports:
+    - port: 80
+      targetPort: 80

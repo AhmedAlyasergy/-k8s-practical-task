@@ -1,0 +1,19 @@
+# hostPath is used here only because this is a local `kind` lab cluster.
+# In a real cluster this would be a cloud disk (EBS/PD/Azure Disk) or a
+# network volume, provisioned dynamically via a StorageClass.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: taskhub-db-pv
+  labels:
+    app: taskhub
+    component: database
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/taskhub-db

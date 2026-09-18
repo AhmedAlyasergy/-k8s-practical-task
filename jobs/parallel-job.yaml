@@ -1,0 +1,28 @@
+# Pattern 2: One completion with parallel executions ("work queue" pattern).
+# `completions` is intentionally omitted: the Job is considered done as soon
+# as ANY one of the parallel Pods exits successfully.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: task-queue-job
+  namespace: taskhub
+  labels:
+    app: taskhub
+    component: job
+spec:
+  parallelism: 3
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: taskhub
+        component: job
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: busybox:1.36
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "echo \"Worker $(hostname) picked up a task from the queue\"; sleep 10; exit 0"

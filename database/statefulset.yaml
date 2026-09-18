@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  namespace: taskhub
+  labels:
+    app: taskhub
+    component: database
+spec:
+  serviceName: database-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taskhub
+      component: database
+  template:
+    metadata:
+      labels:
+        app: taskhub
+        component: database
+        environment: lab
+    spec:
+      containers:
+        - name: database
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: taskhub-secret
+                  key: DATABASE_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskhub-secret
+                  key: DATABASE_PASSWORD
+            - name: POSTGRES_DB
+              value: taskhub
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: taskhub-db-pvc

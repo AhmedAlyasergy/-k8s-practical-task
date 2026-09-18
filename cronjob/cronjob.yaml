@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: taskhub-cleanup
+  namespace: taskhub
+  labels:
+    app: taskhub
+    component: cronjob
+spec:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: taskhub
+            component: cronjob
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cleanup
+              image: busybox:1.36
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "echo \"[$(date)] Running scheduled cleanup task for TaskHub\""
